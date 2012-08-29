@@ -8,12 +8,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class Plugin extends JavaPlugin {
     // TODO: configurable Redis host
@@ -55,41 +58,51 @@ public class Plugin extends JavaPlugin {
     
     public void rewardPlayer(Player player) {
         Jedis redis = pool.getResource();
-        
-        // TODO: configurable redis key
-        String key = "votifier:credits:" + player.getName().toLowerCase();
+        try {
+            // TODO: configurable redis key
+            String key = "votifier:credits:" + player.getName().toLowerCase();
 
-        if(redis.lpop(key) == null) {
-            // TODO: configurable message
-            player.sendMessage("You don't have any vote credits to claim.");
-        }
-        else {
+            if(redis.lpop(key) == null) {
+                // TODO: configurable message
+                player.sendMessage("You don't have any vote credits to claim.");
+                return;
+            }
             
+            // TODO: configurable exp reward
+            player.giveExp(100);
+            // TODO: configurable item reward
+            player.getInventory().addItem(new ItemStack(Material.DIAMOND, 4));
             
-            
+            // TODO: reward currency
+
+
             Long credits = redis.llen(key);
-            // TODO: configurable messages
             player.sendMessage(credits > 0
+                    // TODO: configurable messages
                     ? "Claimed! You have " + credits + " credits left."
                     : "Claimed! Don't forget to vote tomorrow!");
         }
-        
-        pool.returnResource(redis);
-        log("{0} claimed a reward.", player.getName());
+        finally {
+            pool.returnResource(redis);
+            log("{0} claimed a reward.", player.getName());
+        }
     }
     
     
     public void remindPlayer(Player player) {
         Jedis redis = pool.getResource();
-        
-        Double lastClaim = redis.zscore("votifier:claims", player.getName().toLowerCase());
-        // TODO: configurable timeout
-        if(lastClaim == null || (System.currentTimeMillis() / 1000L) - lastClaim > 60 * 60 * 18) {
-            // TODO: configurable message
-            player.sendMessage("You still need to vote today to receive your daily reward!");
+        try {
+            // TODO: configurable key
+            Double lastClaim = redis.zscore("votifier:claims", player.getName().toLowerCase());
+            // TODO: configurable timeout
+            if(lastClaim == null || (System.currentTimeMillis() / 1000L) - lastClaim > 60 * 60 * 18) {
+                // TODO: configurable message
+                player.sendMessage("You still need to vote today to receive your daily reward!");
+            }
         }
-
-        pool.returnResource(redis);
+        finally {
+            pool.returnResource(redis);
+        }
     }
     
     
