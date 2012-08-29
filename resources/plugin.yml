@@ -1,0 +1,14 @@
+name: VoteRewards
+description: Vote rewards for Level Up Minecraft
+author: Kevin Ingersoll
+website: http://levelupmc.com/
+
+main: com.levelupmc.voterewards.Plugin
+version: ${pom.version}
+
+commands:
+  claim:
+    aliases: [reward, vote]
+    description: Claim your vote reward
+    usage: "/<command>"
+    
