@@ -26,6 +26,8 @@ public class Plugin extends JavaPlugin {
     
     @Override
     public void onEnable() {
+        // load config and copy plugin's default config values to it
+        getConfig().options().copyDefaults(true);
         
         getCommand("claim").setExecutor(new CommandExecutor() {
             public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -39,14 +41,15 @@ public class Plugin extends JavaPlugin {
             }
         });
         
-        // TODO: trigger reminder on login and at interval after login
+        // TODO: trigger reminder on login and at interval after login instead of global interval
+        int remindEvery = getConfig().getInt("remindEvery");
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
                 for(Player player : Bukkit.getOnlinePlayers()) {
                     remindPlayer(player);
                 }
             }
-        }, 20*60*2, 20*60*2);// TODO: configurable delay
+        }, remindEvery, remindEvery);
         
     }
     
@@ -63,24 +66,22 @@ public class Plugin extends JavaPlugin {
             String key = "votifier:credits:" + player.getName().toLowerCase();
 
             if(redis.lpop(key) == null) {
-                // TODO: configurable message
-                player.sendMessage("You don't have any vote credits to claim.");
+                player.sendMessage(getConfig().getString("messages.noCredits"));
                 return;
             }
             
-            // TODO: configurable exp reward
-            player.giveExp(100);
-            // TODO: configurable item reward
-            player.getInventory().addItem(new ItemStack(Material.DIAMOND, 4));
+            // reward experience
+            player.giveExp(getConfig().getInt("rewards.experience"));
+            // reward items
+            player.getInventory().addItem(new ItemStack(Material.DIAMOND, getConfig().getInt("rewards.diamonds")));
             
-            // TODO: reward currency
+            // TODO: reward currency?
 
 
             Long credits = redis.llen(key);
             player.sendMessage(credits > 0
-                    // TODO: configurable messages
-                    ? "Claimed! You have " + credits + " credits left."
-                    : "Claimed! Don't forget to vote tomorrow!");
+                    ? String.format(getConfig().getString("messages.claimedWithCredits"), credits)
+                    : getConfig().getString("messages.claimedWithoutCredits"));
         }
         finally {
             pool.returnResource(redis);
@@ -94,10 +95,9 @@ public class Plugin extends JavaPlugin {
         try {
             // TODO: configurable key
             Double lastClaim = redis.zscore("votifier:claims", player.getName().toLowerCase());
-            // TODO: configurable timeout
-            if(lastClaim == null || (System.currentTimeMillis() / 1000L) - lastClaim > 60 * 60 * 18) {
-                // TODO: configurable message
-                player.sendMessage("You still need to vote today to receive your daily reward!");
+
+            if(lastClaim == null || (System.currentTimeMillis() / 1000L) - lastClaim > getConfig().getInt("canVoteEvery")) {
+                player.sendMessage(getConfig().getString("messages.reminder"));
             }
         }
         finally {
