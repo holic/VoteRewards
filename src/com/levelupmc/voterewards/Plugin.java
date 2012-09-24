@@ -3,6 +3,10 @@ package com.levelupmc.voterewards;
 import java.util.logging.Level;
 import java.text.MessageFormat;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,9 +18,8 @@ import redis.clients.jedis.JedisPoolConfig;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
 
 public class Plugin extends JavaPlugin {
     // TODO: configurable Redis host
@@ -70,10 +73,25 @@ public class Plugin extends JavaPlugin {
                 return;
             }
             
+            
             // reward experience
             player.giveExp(getConfig().getInt("rewards.experience"));
+            
             // reward items
-            player.getInventory().addItem(new ItemStack(Material.DIAMOND, getConfig().getInt("rewards.diamonds")));
+            List<Map<?, ?>> items = getConfig().getMapList("rewards.items");
+            if(items != null) {
+                for(Map<?, ?> map : items) {
+                    Map<String, Object> serialized = new HashMap<String, Object>();
+                    for(Map.Entry<?, ?> entry : map.entrySet()) {
+                        if(entry.getKey() instanceof String) {
+                            serialized.put((String) entry.getKey(), entry.getValue());
+                        }
+                    }
+                    ItemStack item = ItemStack.deserialize(serialized);
+                    player.getInventory().addItem(item);
+
+                }
+            }
             
             // TODO: reward currency?
 

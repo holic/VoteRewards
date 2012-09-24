@@ -1,13 +1,16 @@
 canVoteEvery: 64800 # 18 hours in seconds (60 * 60 * 18)
 remindEvery: 2400 # 2 minutes in ticks (20 ticks * 120 seconds)
 
+messages:
+  noCredits: "You don't have any vote credits to claim."
+  claimedWithCredits: "Claimed! You have %d credits left."
+  claimedWithoutCredits: "Claimed! Don't forget to vote tomorrow!"
+  broadcastClaim: "%s just earned some sweet loot for voting at LevelUpMC.com!"
+  reminder: "Don't forget to vote at LevelUpMC.com to receive your daily reward!"
+
 rewards:
   experience: 100
-  diamonds: 4
-
-messages:
-  noCredits: You don't have any vote credits to claim.
-  claimedWithCredits: Claimed! You have %d credits left.
-  claimedWithoutCredits: Claimed! Don't forget to vote tomorrow!
-  broadcastClaim: %s just earned some sweet loot for voting at LevelUpMC.com!
-  reminder: You still need to vote today to receive your daily reward!
+  items:
+  - type: DIAMOND_ORE
+    amount: 4
+  - type: APPLE
