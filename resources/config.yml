@@ -9,4 +9,5 @@ messages:
   noCredits: You don't have any vote credits to claim.
   claimedWithCredits: Claimed! You have %d credits left.
   claimedWithoutCredits: Claimed! Don't forget to vote tomorrow!
+  broadcastClaim: %s just earned some sweet loot for voting at LevelUpMC.com!
   reminder: You still need to vote today to receive your daily reward!

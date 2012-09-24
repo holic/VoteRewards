@@ -82,6 +82,8 @@ public class Plugin extends JavaPlugin {
             player.sendMessage(credits > 0
                     ? String.format(getConfig().getString("messages.claimedWithCredits"), credits)
                     : getConfig().getString("messages.claimedWithoutCredits"));
+            
+            Bukkit.broadcastMessage(String.format(getConfig().getString("messages.broadcastClaim"), player.getName()));
         }
         finally {
             pool.returnResource(redis);
