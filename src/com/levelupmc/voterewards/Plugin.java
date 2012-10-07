@@ -14,6 +14,8 @@ import org.bukkit.command.CommandSender;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Protocol;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -32,7 +34,13 @@ public class Plugin extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         
         // create Jedis pool from configured URI
-        pool = new JedisPool(getConfig().getString("redis"));
+        // pool = new JedisPool(getConfig().getString("redis"));
+        pool = new JedisPool(new JedisPoolConfig(),
+                getConfig().getString("redis.host", "localhost"),
+                getConfig().getInt("redis.port", Protocol.DEFAULT_PORT),
+                getConfig().getInt("redis.timeout", Protocol.DEFAULT_TIMEOUT),
+                getConfig().getString("redis.password", null),
+                getConfig().getInt("redis.database", Protocol.DEFAULT_DATABASE));
         
         
         getCommand("claim").setExecutor(new CommandExecutor() {
