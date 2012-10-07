@@ -14,7 +14,6 @@ import org.bukkit.command.CommandSender;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,7 +22,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class Plugin extends JavaPlugin {
     // TODO: configurable Redis host
-    protected static JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+    protected static JedisPool pool;
     
     // TODO: use REST API instead of a direct connection to Redis?
     
@@ -31,6 +30,10 @@ public class Plugin extends JavaPlugin {
     public void onEnable() {
         // load config and copy plugin's default config values to it
         getConfig().options().copyDefaults(true);
+        
+        // create Jedis pool from configured URI
+        pool = new JedisPool(getConfig().getString("redis"));
+        
         
         getCommand("claim").setExecutor(new CommandExecutor() {
             public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

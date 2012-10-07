@@ -1,3 +1,5 @@
+redis: redis://localhost:6379
+
 canVoteEvery: 64800 # 18 hours in seconds (60 * 60 * 18)
 remindEvery: 2400 # 2 minutes in ticks (20 ticks * 120 seconds)
 
